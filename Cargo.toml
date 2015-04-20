@@ -1,0 +1,14 @@
+[package]
+
+name = "hello"
+version = "0.0.1"
+authors = ["KINETC <starvessel@naver.com>"]
+
+[dependencies.glutin]
+git = "https://github.com/tomaka/glutin"
+
+[dependencies.nalgebra]
+git = "https://github.com/sebcrozet/nalgebra"
+
+[dependencies]
+glium = "*"

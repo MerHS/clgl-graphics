@@ -1,0 +1,19 @@
+CATMULL_ROM
+2 # Cross section
+5 # Control point#/cross section
+10 10 # 2D position on XZ plane
+20 15
+15 20
+50 20
+60 30
+1.5 # Scaling factor
+1.2 1 0 0 # Rotation angle/vector
+10 50 30 # Position
+30 50 # Next Section
+40 40
+30 30
+20 40
+10 50
+1.2
+1 1 0 0
+0 0 0
