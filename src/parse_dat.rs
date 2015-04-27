@@ -1,5 +1,5 @@
-use na::{Vec2, Vec3};
-
+use na::{Vec2, Vec3, UnitQuat, Norm};
+use std::borrow::ToOwned;
 use std::fs::File;
 use std::io::{Read,Result};
 //use std::path::{Path, PathBuf};
@@ -39,7 +39,7 @@ fn parse_num(args: &str) -> Vec<f32>{
                    .collect()
 }
 
-pub fn parse_file(mut f: File) -> Object {
+pub fn parse_file(mut f: File, name: &str) -> Object {
     let mut text = String::new();
     match f.read_to_string(&mut text){
         Err(why) => panic!("couldn't read {}:",
@@ -54,10 +54,10 @@ pub fn parse_file(mut f: File) -> Object {
                  .parse::<i32>().unwrap();
     let point_n = parse_str(lns.next().unwrap())
                  .parse::<i32>().unwrap();
-    let mut sect = Vec::new();
+    let mut sect = Vec::with_capacity(sect_n as usize);
 
     for _ in 0..sect_n {
-        let mut cont_pos = Vec::new();
+        let mut cont_pos = Vec::with_capacity(point_n as usize);
         for _ in 0..point_n {
             let c_pos: Vec<f32> = parse_num(lns.next().unwrap());
             cont_pos.push(Vec2::new(c_pos[0], c_pos[1]));
@@ -68,11 +68,13 @@ pub fn parse_file(mut f: File) -> Object {
         sect.push(
             Section{ cont_pos: cont_pos,
                      scale: scale,
-                     rot_angle: rot[0],
-                     rot_vec: Vec3::new(rot[1], rot[2], rot[3]),
+                     rot: UnitQuat::new(
+                         Vec3::new(rot[1], rot[2], rot[3]).normalize()
+                         * (rot[0] as f32)),
                      pos: Vec3::new(t_pos[0], t_pos[1], t_pos[2])});
     }
-    Object { spline: spline,
+    Object { name: (*name).to_owned(),
+             spline: spline,
              sect_n: sect_n,
              point_n: point_n,
              sect: sect}

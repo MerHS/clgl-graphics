@@ -4,9 +4,9 @@
 //#[macro_use]
 //extern crate glium;
 extern crate nalgebra as na;
-#[macro_use]
-extern crate glium;
-extern crate glutin;
+//#[macro_use]
+//extern crate glium;
+//extern crate glutin;
 
 use std::env;
 
@@ -16,10 +16,9 @@ pub mod spline;
 
 use section::Object;
 use spline::*;
-use na::Vec2;
 
 fn main() {
-    use glium::DisplayBuild;
+//    use glium::DisplayBuild;
 
     // parsing arguments
     let mut args: Vec<String> = Vec::new();
@@ -34,7 +33,7 @@ fn main() {
     let mut objs: Vec<Object> = Vec::new();
     for arg in args{
         match parse_dat::load(&arg) {
-            Ok(f) => objs.push(parse_dat::parse_file(f)),
+            Ok(f) => objs.push(parse_dat::parse_file(f, &arg)),
             Err(_) => println!("not exists {}", arg),
         }
     }
@@ -49,20 +48,28 @@ fn main() {
         println!("point: {:?}", obj.point_n);
         for sect in obj.sect.iter(){
             println!("scale : {:?}", sect.scale);
-            println!("rot_angle : {:?}", sect.rot_angle);
             println!("{:?}",bezier_dots2(4,
                                         &sect.cont_pos[0],
                                         &sect.cont_pos[1],
                                         &sect.cont_pos[2],
                                         &sect.cont_pos[3]));
         }
+        obj.make_swept_file(5,5);
+    }
+    
+/*    // building Display
+    struct Vertex{
+        position: [f32; 3],
     }
 
-    // building Display
-    let display = glutin::WindowBuilder::new().build_glium().unwrap();
-//        .with_dimensions(1024,1024)
-//        .with_depth_buffer(32)
-//        .with_title(format!("Rust Sweeper"))
-//        .build_glium().unwrap();
+    implement_vertex!(Vertex, position);
 
+    let display = glutin::WindowBuilder::new()
+        .with_dimensions(1024,1024)
+        .with_depth_buffer(32)
+        .with_title(format!("Rust Sweeper"))
+        .build_glium().unwrap();
+
+    let vertex_buffer = glium::VertexBuffer::new(&display, shape);
+*/
 }
