@@ -30,8 +30,8 @@ pub fn bezier_dots3(part: i32, c0: &Vec3<f32>, c1: &Vec3<f32>,
 }
 
 pub fn catmull_size(part: i32, c0: &f32, c1: &f32, c2: &f32, c3: &f32) -> Vec<f32>{
-    let p1 = *c1 + (*c2-*c0)*0.5;
-    let p2 = *c2 + (*c1-*c3)*0.5;
+    let p1 = *c1 + (*c2-*c0) / 6.0;
+    let p2 = *c2 + (*c1-*c3) / 6.0;
     (0..part).map(|t| 1.0 * (t as f32) / (part as f32))
              .map(|t: f32| *c1 * ((1.0 - t).powi(3))
                         + p1 * 3.0*t*(1.0-t)*(1.0-t)
@@ -42,29 +42,29 @@ pub fn catmull_size(part: i32, c0: &f32, c1: &f32, c2: &f32, c3: &f32) -> Vec<f3
 
 pub fn catmull_dots2(part: i32, c0: &Vec2<f32>, c1: &Vec2<f32>,
                     c2: &Vec2<f32>, c3: &Vec2<f32>) -> Vec<Vec2<f32>>{
-    bezier_dots2(part, c1, &(*c1 + (*c2-*c0) * 0.5), &(*c2 + (*c1-*c3) * 0.5), c2)
+    bezier_dots2(part, c1, &(*c1 + (*c2-*c0) / 6.0), &(*c2 + (*c1-*c3) / 6.0), c2)
 }
 
 pub fn catmull_dots3(part: i32, c0: &Vec3<f32>, c1: &Vec3<f32>,
                     c2: &Vec3<f32>, c3: &Vec3<f32>) -> Vec<Vec3<f32>>{
-    bezier_dots3(part, c1, &(*c1 + (*c2-*c0) * 0.5), &(*c2 + (*c1-*c3) * 0.5), c2)
+    bezier_dots3(part, c1, &(*c1 + (*c2-*c0) / 6.0), &(*c2 + (*c1-*c3) / 6.0), c2)
 }
 
 pub fn bspline_dots2(part: i32, c0: &Vec2<f32>, c1: &Vec2<f32>,
                     c2: &Vec2<f32>, c3: &Vec2<f32>) -> Vec<Vec2<f32>>{
     (0..part).map(|t| 1.0 * (t as f32) / (part as f32))
-             .map(|t: f32| (*c0 * (1.0 - 3.0*t + 3.0*t*t - t*t*t)
-                      + *c1 * (4.0 - 6.0*t*t + 3.0*t*t*t)
-                      + *c2 * (1.0 + 3.0*t + 3.0*t*t + 3.0*t*t*t)
+             .map(|t: f32| (*c0 * ((1.0 - t).powi(3))
+                      + *c1 * (3.0*t*t*t - 6.0*t*t +4.0)
+                      + *c2 * (1.0 + 3.0*t + 3.0*t*t - 3.0*t*t*t)
                       + *c3 * (t*t*t)) / 6.0)
              .collect()
 }
 pub fn bspline_dots3(part: i32, c0: &Vec3<f32>, c1: &Vec3<f32>,
                     c2: &Vec3<f32>, c3: &Vec3<f32>) -> Vec<Vec3<f32>>{
     (0..part).map(|t| 1.0 * (t as f32) / (part as f32))
-             .map(|t: f32| (*c0 * (1.0 - 3.0*t + 3.0*t*t - t*t*t)
-                      + *c1 * (4.0 - 6.0*t*t + 3.0*t*t*t)
-                      + *c2 * (1.0 + 3.0*t + 3.0*t*t + 3.0*t*t*t)
+             .map(|t: f32| (*c0 * ((1.0 - t).powi(3))
+                      + *c1 * (3.0*t*t*t - 6.0*t*t +4.0)
+                      + *c2 * (1.0 + 3.0*t + 3.0*t*t - 3.0*t*t*t)
                       + *c3 * (t*t*t)) / 6.0)
              .collect()
 }

@@ -67,7 +67,7 @@ impl Object{
                 s.write_self(&(*self).spline, b_part, &mut file);
             }
         } else {
-            let spline_s0 = Section::make_spline(s_part, &sect[0], &sect[1], &sect[2], &sect[2]);
+            let spline_s0 = Section::make_spline(s_part, &sect[0], &sect[0], &sect[1], &sect[2]);
             for s in spline_s0 {
                 s.write_self(&(*self).spline, b_part, &mut file);
             }
@@ -80,7 +80,7 @@ impl Object{
                 }
             }
             let i = (self.sect_n - 1) as usize;
-            let spline_s1 = Section::make_spline(s_part, &sect[i-2], &sect[i-2], &sect[i-1], &sect[i]);
+            let spline_s1 = Section::make_spline(s_part, &sect[i-2], &sect[i-1], &sect[i], &sect[i]);
             for s in spline_s1 {
                 s.write_self(&(*self).spline, b_part, &mut file);
             }
@@ -151,7 +151,7 @@ impl Section{
             let (i1, i2, i3) = ((c_len+i0+1)%c_len, (c_len+i0+2)%c_len, (c_len+i0+3)%c_len);
             let v_part = bspline_dots3(b_part, &cont_b[i0], &cont_b[i1], &cont_b[i2], &cont_b[i3]);
             for v in v_part{
-                vertex.push_str(&format!("{} {} {}\n", v.x, v.y, v.z));
+                vertex.push_str(&format!("({} {} {})\n", v.x, v.y, v.z));
             }
         }
         vertex

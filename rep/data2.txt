@@ -1,0 +1,59 @@
+BSPLINE
+8 # Cross section
+4 # Control point#/cross section
+0 1 # 2D position on XZ plane
+1 0
+0 -1
+-1 0
+1 # Scaling factor
+0 0 1 0 # Rotation angle/vector
+0 0 0 # Position
+0 1.2 # Next Section
+1.2 0
+0 -1.2
+-1.2 0
+1
+0 0 1 0
+0 1 0
+0 1 # Next Section
+1 0
+0 -1
+-1 0
+1
+0 0 1 0
+0 2 0
+0 1.5 # Next Section
+1.5 0
+0 -1.5
+-1.5 0
+1
+0 0 1 0
+0 3 0
+0 1.2 # Next Section
+1.2 0
+0 -1.2
+-1.2 0
+1
+0 0 1 0
+0 4 0
+0 1 # Next Section
+1 0
+0 -1
+-1 0
+1
+0 0 1 0
+0 5 0
+0 1.5 # Next Section
+1.5 0
+0 -1.5
+-1.5 0
+1
+0 0 1 0
+0 6 0
+0 1.7 # Next Section
+1.7 0
+0 -1.7
+-1.7 0
+1
+0 0 1 0
+0 7 0

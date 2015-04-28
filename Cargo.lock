@@ -1,5 +1,5 @@
 [root]
-name = "hello"
+name = "spline_maker"
 version = "0.0.1"
 dependencies = [
  "nalgebra 0.2.10 (git+https://github.com/sebcrozet/nalgebra)",

@@ -6,6 +6,7 @@ use std::io::{Read,Result};
 use std::path::Path;
 use std::env::current_exe;
 use std::error::Error;
+use std::str::LinesAny;
 
 use section::{Section, Object, Spline};
 
@@ -29,7 +30,7 @@ pub fn load<T: AsRef<Path>>(name: &T) -> Result<File>{
     File::open(&*res_debug)
 }
 
-fn parse_str(args: &str) -> &str{
+fn parse_str(args: LinesAny) -> &str{
     args.split("#").next().unwrap().trim()
 }
 

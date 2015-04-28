@@ -54,7 +54,7 @@ fn main() {
                                         &sect.cont_pos[2],
                                         &sect.cont_pos[3]));
         }
-   */     obj.make_swept_file(5,5);
+   */     obj.make_swept_file(20,10);
     }
     
 /*    // building Display
