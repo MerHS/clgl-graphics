@@ -43,63 +43,60 @@ impl Spline{
 impl Object{
     pub fn make_swept_file(&self, s_part: i32, b_part: i32){
         let ref sect = self.sect;
-        let path_str = &format!("{}.obj",self.name);
-        let path = Path::new(path_str);
+        //let path_str = format!("{}.obj",self.name);
+        let path_str = "data.obj";
+        let path = Path::new(&path_str);
         let mut file = match File::create(&path){
             Err(why) => panic!("Couldn't create {}", Error::description(&why)),
             Ok(file) => file,
         };
-        file.write_all(format!("{} {}\n", (self.sect_n -1) * s_part + 1,
+        let _ = file.write_all(format!("({} {})\n", (self.sect_n -1) * s_part + 1,
                                self.point_n * b_part).as_bytes());
         if self.sect_n == 2{
             let spline_s= Section::make_spline(s_part, &sect[0], &sect[0], &sect[1], &sect[1]);
             for s in spline_s {
-                let _ = match (*self).spline {
-                    Spline::Bspline => file.write_all(s.to_vertex_bs(b_part).as_bytes()),
-                    Spline::Catmull => file.write_all(s.to_vertex_cm(b_part).as_bytes()),
-                    Spline::Natural => file.write_all(s.to_vertex_nt(b_part).as_bytes()),
-                };
+                s.write_self(&(*self).spline, b_part, &mut file);
             }
         } else if self.sect_n == 3 {
             let spline_s0 = Section::make_spline(s_part, &sect[0], &sect[0], &sect[1], &sect[2]);
             let spline_s1 = Section::make_spline(s_part, &sect[0], &sect[1], &sect[2], &sect[2]);
             for s in spline_s0 {
-               let _ =  match (*self).spline {
-                    Spline::Bspline => file.write_all(s.to_vertex_bs(b_part).as_bytes()),
-                    Spline::Catmull => file.write_all(s.to_vertex_cm(b_part).as_bytes()),
-                    Spline::Natural => file.write_all(s.to_vertex_nt(b_part).as_bytes()),
-                };
+                s.write_self(&(*self).spline, b_part, &mut file);
             }
             for s in spline_s1 {
-                let _ = match (*self).spline {
-                    Spline::Bspline => file.write_all(s.to_vertex_bs(b_part).as_bytes()),
-                    Spline::Catmull => file.write_all(s.to_vertex_cm(b_part).as_bytes()),
-                    Spline::Natural => file.write_all(s.to_vertex_nt(b_part).as_bytes()),
-                };
+                s.write_self(&(*self).spline, b_part, &mut file);
             }
         } else {
+            let spline_s0 = Section::make_spline(s_part, &sect[0], &sect[1], &sect[2], &sect[2]);
+            for s in spline_s0 {
+                s.write_self(&(*self).spline, b_part, &mut file);
+            }
             for j in (0..(self.sect_n-3)){
                 let i = j as usize;
                 let spline_s = Section::make_spline(s_part, &sect[i], &sect[i+1],
                                                     &sect[i+2], &sect[i+3]);
                 for s in spline_s {
-                    let _ = match (*self).spline {
-                        Spline::Bspline => file.write_all(s.to_vertex_bs(b_part).as_bytes()),
-                        Spline::Catmull => file.write_all(s.to_vertex_cm(b_part).as_bytes()),
-                        Spline::Natural => file.write_all(s.to_vertex_nt(b_part).as_bytes()),
-                    };
+                    s.write_self(&(*self).spline, b_part, &mut file);
                 }
             }
+            let i = (self.sect_n - 1) as usize;
+            let spline_s1 = Section::make_spline(s_part, &sect[i-2], &sect[i-2], &sect[i-1], &sect[i]);
+            for s in spline_s1 {
+                s.write_self(&(*self).spline, b_part, &mut file);
+            }
         }
-        let _ = match (*self).spline {
-            Spline::Bspline => file.write_all(sect[(self.sect_n -1) as usize].to_vertex_bs(b_part).as_bytes()),
-            Spline::Catmull => file.write_all(sect[(self.sect_n -1) as usize].to_vertex_cm(b_part).as_bytes()),
-            Spline::Natural => file.write_all(sect[(self.sect_n -1) as usize].to_vertex_nt(b_part).as_bytes()),
-        };
+        sect[(self.sect_n -1) as usize].write_self(&(*self).spline, b_part, &mut file);
     }
 }
 
 impl Section{
+    pub fn write_self(&self, s: &Spline, b_part: i32, file: &mut File){
+        let _ = match *s {
+            Spline::Bspline => file.write_all(self.to_vertex_bs(b_part).as_bytes()),
+            Spline::Catmull => file.write_all(self.to_vertex_cm(b_part).as_bytes()),
+            Spline::Natural => file.write_all(self.to_vertex_nt(b_part).as_bytes()),
+        };
+    }
     pub fn make_spline(part: i32, s0: &Section, s1: &Section,
                        s2: &Section, s3: &Section)-> Vec<Section> {
         let mut sects: Vec<Section> = Vec::with_capacity(part as usize);
@@ -173,7 +170,7 @@ impl Section{
             let (i1, i2, i3) = ((c_len+i0+1)%c_len, (c_len+i0+2)%c_len, (c_len+i0+3)%c_len);
             let v_part = catmull_dots3(b_part, &cont_b[i0], &cont_b[i1], &cont_b[i2], &cont_b[i3]);
             for v in v_part{
-                vertex.push_str(&format!("{} {} {}\n", v.x, v.y, v.z));
+                vertex.push_str(&format!("({} {} {})\n", v.x, v.y, v.z));
             }
         }
         vertex

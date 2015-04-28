@@ -43,7 +43,7 @@ fn main() {
     }
 
     for obj in objs.iter(){
-        println!("spl : {:?}", obj.spline);
+ /*       println!("spl : {:?}", obj.spline);
         println!("sectn : {:?}", obj.sect_n);
         println!("point: {:?}", obj.point_n);
         for sect in obj.sect.iter(){
@@ -54,7 +54,7 @@ fn main() {
                                         &sect.cont_pos[2],
                                         &sect.cont_pos[3]));
         }
-        obj.make_swept_file(5,5);
+   */     obj.make_swept_file(5,5);
     }
     
 /*    // building Display
