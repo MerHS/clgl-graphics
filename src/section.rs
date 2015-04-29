@@ -13,6 +13,7 @@ pub enum Spline {
     Natural,
 }
 
+#[derive(Debug)]
 pub struct Section {
     pub cont_pos: Vec<Vec2<f32>>,
     pub scale: f32,
@@ -20,6 +21,7 @@ pub struct Section {
     pub pos: Vec3<f32>
 }
 
+#[derive(Debug)]
 pub struct Object {
     pub name: String,
     pub spline: Spline,

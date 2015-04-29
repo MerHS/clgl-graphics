@@ -89,6 +89,6 @@ pub fn bezier_quats(part: i32, c0: &UnitQuat<f32>, c1: &UnitQuat<f32>,
 pub fn catmull_quats(part: i32, c0: &UnitQuat<f32>, c1: &UnitQuat<f32>,
                      c2: &UnitQuat<f32>, c3: &UnitQuat<f32>) -> Vec<UnitQuat<f32>>{
     let a = (*c1) * UnitQuat::new(((*c0).inv().unwrap() * (*c2)).rotation() / 6.0);
-    let b = (*c2) * UnitQuat::new(((*c1).inv().unwrap() * (*c3)).rotation() / -6.0);
+    let b = (*c2) * UnitQuat::new(((*c3).inv().unwrap() * (*c1)).rotation() / 6.0);
     bezier_quats(part, c1, &a, &b, c2)
 }

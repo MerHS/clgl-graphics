@@ -3,9 +3,9 @@
 (asdf:load-system :cl-glu)
 (asdf:load-system :cl-glut)
 
-(defparameter *init-dist* 20.0)
+(defparameter *init-dist* 40.0)
 
-(defvar cam-pos '(0.57735026 0.57735026 0.57735026))
+(defvar cam-pos '(0.0 1.0 0.0))
 (defvar cam-ori '(0.0 0.0 0.0))
 (defvar cam-up '(0.0 0.0 1.0))
 (defvar cam-dist *init-dist*)
@@ -17,8 +17,12 @@
 (defvar norm-u)
 (defvar norm-v)
 (defvar key-buf (make-array 190 :element-type 'bit :initial-element 0))
-(defvar obj ())
-(defvar sn-vn)
+(defvar bishop)
+(defvar rook)
+(defvar knight)
+(defvar pawn)
+(defvar king)
+(defvar queen)
 
 (defmacro col255 (cfun &rest r)
   `(,cfun ,@(loop while r collect (/ (pop r) 255.0))))
@@ -41,27 +45,41 @@
     (apply #'gl:vertex (car b))
     (vert-obj (cdr a) (cdr b))))
 
-(defun show-obj (aobj dobj)
+(defun show-obj (aobj dobj vcol pcol)
   (if dobj
       (let ((adobj (car dobj)))
-        (gl:color 0.2 0.1 0.5)
+        (apply #'gl:color vcol)
         (gl:with-primitives
           :line-loop
           (poly-obj aobj))
-        (gl:color 0.1 0.1 0.1)
+        (apply #'gl:color pcol)
         (gl:with-primitives 
           :triangle-strip
           (vert-obj aobj adobj)
           (apply #'gl:vertex (car aobj))
           (apply #'gl:vertex (car adobj)))
-        (show-obj (car dobj) (cdr dobj)))
+        (show-obj (car dobj) (cdr dobj) vcol pcol))
       (progn
-        (gl:color 0.2 0.1 0.5)
+        (apply #'gl:color vcol)
         (gl:with-primitives
           :line-loop (poly-obj aobj))
-        (gl:color 0 0 0)
+        (apply #'gl:color pcol)
         (gl:with-primitives
           :polygon (poly-obj aobj)))))
+
+(defun draw-piece (piece vcol pcol pos)
+  (gl:with-pushed-matrix
+    (apply #'gl:color pcol)
+    (apply #'gl:translate pos)
+    (gl:with-primitives :polygon (poly-obj (car piece)))
+    (show-obj (car piece) (cdr piece) vcol pcol)
+    ))
+
+(defun draw-block (pcol pos)
+  (gl:with-pushed-matrix
+    (apply #'gl:color pcol)
+    (apply #'gl:translate pos)
+    (glut:solid-cube 3)))
 
 (defun vec-len (v)
   (sqrt (reduce (lambda (x y) (+ x (* y y))) v :initial-value 0)))
@@ -144,7 +162,7 @@
   (gl:matrix-mode :projection)
   (gl:load-identity)
   
-  (glu:perspective cam-fovy (/ (car win-size) (cdr win-size)) 0.1 100)
+  (glu:perspective cam-fovy (/ (car win-size) (cdr win-size)) 0.1 500)
   
   (let* ((temp-pos (mapcar #'+ cam-pos cam-ori))
          (temp-mat (mapcar (lambda (x) (* cam-dist x)) (append temp-pos cam-ori cam-up))))
@@ -190,14 +208,123 @@
   (gl:matrix-mode :modelview)
   (gl:load-identity)
   
-  ;(gl:light :light0 :position (vector -2 -2 -2 0))
-  ;(gl:light :light0 :diffuse (vector 1 1 1 1))
+  (draw-piece pawn '(0.2 0.1 0.5) '(1 1 1) '(12 0 6))
+  (draw-piece pawn '(0.2 0.1 0.5) '(1 1 1) '(9 0 6))
+  (draw-piece pawn '(0.2 0.1 0.5) '(1 1 1) '(6 0 6))
+  (draw-piece pawn '(0.2 0.1 0.5) '(1 1 1) '(3 0 6))
+  (draw-piece pawn '(0.2 0.1 0.5) '(1 1 1) '(0 0 6))
+  (draw-piece pawn '(0.2 0.1 0.5) '(1 1 1) '(-3 0 6))
+  (draw-piece pawn '(0.2 0.1 0.5) '(1 1 1) '(-6 0 6))
+  (draw-piece pawn '(0.2 0.1 0.5) '(1 1 1) '(-9 0 6))
   
-  ;(gl:material :front :ambient-and-diffuse
-  ;             (vec255 172 188 10 255))
-  (gl:color 0 0 0)
-  (gl:with-primitives :polygon (poly-obj (car obj)))
-  (show-obj (car obj) (cdr obj))
+  (draw-piece rook '(0.2 0.1 0.5) '(1 1 1) '(12 0 9))
+  (draw-piece knight '(0.2 0.1 0.5) '(1 1 1) '(9 0 9))
+  (draw-piece bishop '(0.2 0.1 0.5) '(1 1 1) '(6 0 9))
+  (draw-piece king '(0.2 0.1 0.5) '(1 1 1) '(3 0 9))
+  (draw-piece queen '(0.2 0.1 0.5) '(1 1 1) '(0 0 9))
+  (draw-piece bishop '(0.2 0.1 0.5) '(1 1 1) '(-3 0 9))
+  (draw-piece knight '(0.2 0.1 0.5) '(1 1 1) '(-6 0 9))
+  (draw-piece rook '(0.2 0.1 0.5) '(1 1 1) '(-9 0 9))
+  
+  
+  (draw-piece pawn '(0.5 0.1 0.2) '(0 0 0) '(12 0 -9))
+  (draw-piece pawn '(0.5 0.1 0.2) '(0 0 0) '(9 0 -9))
+  (draw-piece pawn '(0.5 0.1 0.2) '(0 0 0) '(6 0 -9))
+  (draw-piece pawn '(0.5 0.1 0.2) '(0 0 0) '(3 0 -9))
+  (draw-piece pawn '(0.5 0.1 0.2) '(0 0 0) '(0 0 -9))
+  (draw-piece pawn '(0.5 0.1 0.2) '(0 0 0) '(-3 0 -9))
+  (draw-piece pawn '(0.5 0.1 0.2) '(0 0 0) '(-6 0 -9))
+  (draw-piece pawn '(0.5 0.1 0.2) '(0 0 0) '(-9 0 -9))
+  
+  (draw-piece rook '(0.5 0.1 0.2) '(0 0 0) '(12 0 -12))
+  (draw-piece knight '(0.5 0.1 0.2) '(0 0 0) '(9 0 -12))
+  (draw-piece bishop '(0.5 0.1 0.2) '(0 0 0) '(6 0 -12))
+  (draw-piece king '(0.5 0.1 0.2) '(0 0 0) '(3 0 -12))
+  (draw-piece queen '(0.5 0.1 0.2) '(0 0 0) '(0 0 -12))
+  (draw-piece bishop '(0.5 0.1 0.2) '(0 0 0) '(-3 0 -12))
+  (draw-piece knight '(0.5 0.1 0.2) '(0 0 0) '(-6 0 -12))
+  (draw-piece rook '(0.5 0.1 0.2) '(0 0 0) '(-9 0 -12))
+  
+  (draw-block '(1 1 1) '(12 -1.5 0))
+  (draw-block '(1 1 1) '(6 -1.5 0))
+  (draw-block '(1 1 1) '(0 -1.5 0))
+  (draw-block '(1 1 1) '(-6 -1.5 0))
+
+  (draw-block '(1 1 1) '(9 -1.5 3))
+  (draw-block '(1 1 1) '(3 -1.5 3))
+  (draw-block '(1 1 1) '(-3 -1.5 3))
+  (draw-block '(1 1 1) '(-9 -1.5 3))
+  
+  (draw-block '(1 1 1) '(12 -1.5 6))
+  (draw-block '(1 1 1) '(6 -1.5 6))
+  (draw-block '(1 1 1) '(0 -1.5 6))
+  (draw-block '(1 1 1) '(-6 -1.5 6))
+
+  (draw-block '(1 1 1) '(9 -1.5 9))
+  (draw-block '(1 1 1) '(3 -1.5 9))
+  (draw-block '(1 1 1) '(-3 -1.5 9))
+  (draw-block '(1 1 1) '(-9 -1.5 9))
+  
+  (draw-block '(1 1 1) '(12 -1.5 -6))
+  (draw-block '(1 1 1) '(6 -1.5 -6))
+  (draw-block '(1 1 1) '(0 -1.5 -6))
+  (draw-block '(1 1 1) '(-6 -1.5 -6))
+
+  (draw-block '(1 1 1) '(9 -1.5 -3))
+  (draw-block '(1 1 1) '(3 -1.5 -3))
+  (draw-block '(1 1 1) '(-3 -1.5 -3))
+  (draw-block '(1 1 1) '(-9 -1.5 -3))
+  
+  (draw-block '(1 1 1) '(12 -1.5 -12))
+  (draw-block '(1 1 1) '(6 -1.5 -12))
+  (draw-block '(1 1 1) '(0 -1.5 -12))
+  (draw-block '(1 1 1) '(-6 -1.5 -12))
+
+  (draw-block '(1 1 1) '(9 -1.5 -9))
+  (draw-block '(1 1 1) '(3 -1.5 -9))
+  (draw-block '(1 1 1) '(-3 -1.5 -9))
+  (draw-block '(1 1 1) '(-9 -1.5 -9))
+  
+  
+  (draw-block '(0 0 0) '(12 -1.5 3))
+  (draw-block '(0 0 0) '(6 -1.5 3))
+  (draw-block '(0 0 0) '(0 -1.5 3))
+  (draw-block '(0 0 0) '(-6 -1.5 3))
+
+  (draw-block '(0 0 0) '(9 -1.5 6))
+  (draw-block '(0 0 0) '(3 -1.5 6))
+  (draw-block '(0 0 0) '(-3 -1.5 6))
+  (draw-block '(0 0 0) '(-9 -1.5 6))
+  
+  (draw-block '(0 0 0) '(12 -1.5 9))
+  (draw-block '(0 0 0) '(6 -1.5 9))
+  (draw-block '(0 0 0) '(0 -1.5 9))
+  (draw-block '(0 0 0) '(-6 -1.5 9))
+
+  (draw-block '(0 0 0) '(9 -1.5 -12))
+  (draw-block '(0 0 0) '(3 -1.5 -12))
+  (draw-block '(0 0 0) '(-3 -1.5 -12))
+  (draw-block '(0 0 0) '(-9 -1.5 -12))
+  
+  (draw-block '(0 0 0) '(12 -1.5 -3))
+  (draw-block '(0 0 0) '(6 -1.5 -3))
+  (draw-block '(0 0 0) '(0 -1.5 -3))
+  (draw-block '(0 0 0) '(-6 -1.5 -3))
+
+  (draw-block '(0 0 0) '(9 -1.5 -6))
+  (draw-block '(0 0 0) '(3 -1.5 -6))
+  (draw-block '(0 0 0) '(-3 -1.5 -6))
+  (draw-block '(0 0 0) '(-9 -1.5 -6))
+  
+  (draw-block '(0 0 0) '(12 -1.5 -9))
+  (draw-block '(0 0 0) '(6 -1.5 -9))
+  (draw-block '(0 0 0) '(0 -1.5 -9))
+  (draw-block '(0 0 0) '(-6 -1.5 -9))
+
+  (draw-block '(0 0 0) '(9 -1.5 0))
+  (draw-block '(0 0 0) '(3 -1.5 0))
+  (draw-block '(0 0 0) '(-3 -1.5 0))
+  (draw-block '(0 0 0) '(-9 -1.5 0))
   
   (glut:swap-buffers)
   )
@@ -259,10 +386,7 @@
               (setf cam-pos (normalize cam-pos))
               )
             (set-project)
-            ))
-        (:wheel-down
-          (print 'down))
-        ))
+            ))))
 
 (defmethod glut:motion ((win my-window) x y)
   (cond
@@ -277,7 +401,7 @@
                                       (max 0.1 
                                            (+ dist-origin
                                               (/ (- y (cdr click-pos))
-                                                 (* 0.125 (cdr win-middle))))))))
+                                                 (* 0.03125 (cdr win-middle))))))))
   (set-project)
   (glut:post-redisplay))
 
@@ -314,19 +438,25 @@
 (defmethod glut:idle ((win my-window))
   (glut:post-redisplay))
 
-
+(defun load-path (path)
+  (let* ((in (open path)))
+    (when in
+      (let* ((sv (read in))
+             (ret-val 
+               (rep-n 
+                 (lambda () (rep-n 
+                              (lambda () (read in))
+                              (cadr sv)))
+                 (car sv))))
+        (close in)
+        ret-val))))
 
 (progn
-  (let ((in (open "data.obj")))
-    (when in
-      (let ((sv (read in)))
-        (setf sn-vn sv))
-      (setf obj 
-            (rep-n 
-              (lambda () (rep-n 
-                           (lambda () (read in))
-                           (cadr sn-vn)))
-              (car sn-vn)))
-      (close in)))
+  (setf rook (load-path "res/rook.obj"))
+  (setf pawn (load-path "res/pawn.obj"))
+  (setf king (load-path "res/king.obj"))
+  (setf knight (load-path "res/knight.obj"))
+  (setf bishop (load-path "res/bishop.obj"))
+  (setf queen (load-path "res/queen.obj"))
   (glut:display-window 
     (make-instance 'my-window)))

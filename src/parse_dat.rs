@@ -6,7 +6,6 @@ use std::io::{Read,Result};
 use std::path::Path;
 use std::env::current_exe;
 use std::error::Error;
-use std::str::LinesAny;
 
 use section::{Section, Object, Spline};
 
@@ -30,16 +29,31 @@ pub fn load<T: AsRef<Path>>(name: &T) -> Result<File>{
     File::open(&*res_debug)
 }
 
-fn parse_str(args: LinesAny) -> &str{
+fn parse_str(args: &str) -> &str{
     args.split("#").next().unwrap().trim()
 }
 
 fn parse_num(args: &str) -> Vec<f32>{
-    parse_str(args).split(' ')
+    args.split(' ')
                    .map(|x| x.parse::<f32>().unwrap())
                    .collect()
 }
-
+fn delete_blank(text: &mut String) -> String{
+    let mut ret_val = String::new();
+    for line in text.lines_any(){
+        let ln = parse_str(&line);
+        if ln.len() > 0{
+            ret_val.push_str(ln);
+            ret_val.push_str("\n");
+        }
+    }
+    ret_val
+}
+//pub fn prin1(sect :&Vec<Section>){
+//    for s in (*sect).iter(){
+//        println!("{:?}",s);
+//    }
+//}
 pub fn parse_file(mut f: File, name: &str) -> Object {
     let mut text = String::new();
     match f.read_to_string(&mut text){
@@ -47,13 +61,13 @@ pub fn parse_file(mut f: File, name: &str) -> Object {
                            Error::description(&why)),
         Ok(_) => (),
     }
+    let txt = delete_blank(&mut text);
+    let mut lns = txt.lines_any();
 
-    let mut lns = text.lines_any();
-
-    let spline = Spline::new(parse_str(lns.next().unwrap()));
-    let sect_n = parse_str(lns.next().unwrap())
+    let spline = Spline::new(lns.next().unwrap());
+    let sect_n = lns.next().unwrap()
                  .parse::<i32>().unwrap();
-    let point_n = parse_str(lns.next().unwrap())
+    let point_n = lns.next().unwrap()
                  .parse::<i32>().unwrap();
     let mut sect = Vec::with_capacity(sect_n as usize);
 
@@ -64,8 +78,12 @@ pub fn parse_file(mut f: File, name: &str) -> Object {
             cont_pos.push(Vec2::new(c_pos[0], c_pos[1]));
         }
         let scale = (parse_num(lns.next().unwrap()))[0];
-        let rot = parse_num(lns.next().unwrap());
+        let mut rot = parse_num(lns.next().unwrap());
         let t_pos = parse_num(lns.next().unwrap());
+        if rot[1] == 0.0 && rot[2] == 0.0 && rot[3] == 0.0{
+            rot[0] = 0.0;
+            rot[1] = 1.0;
+        }
         sect.push(
             Section{ cont_pos: cont_pos,
                      scale: scale,
@@ -74,6 +92,7 @@ pub fn parse_file(mut f: File, name: &str) -> Object {
                          * (rot[0] as f32)),
                      pos: Vec3::new(t_pos[0], t_pos[1], t_pos[2])});
     }
+    //prin1(&sect);
     Object { name: (*name).to_owned(),
              spline: spline,
              sect_n: sect_n,

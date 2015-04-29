@@ -3,7 +3,7 @@
 (asdf:load-system :cl-glu)
 (asdf:load-system :cl-glut)
 
-(defparameter *init-dist* 20.0)
+(defparameter *init-dist* 40.0)
 
 (defvar cam-pos '(0.57735026 0.57735026 0.57735026))
 (defvar cam-ori '(0.0 0.0 0.0))
@@ -144,7 +144,7 @@
   (gl:matrix-mode :projection)
   (gl:load-identity)
   
-  (glu:perspective cam-fovy (/ (car win-size) (cdr win-size)) 0.1 100)
+  (glu:perspective cam-fovy (/ (car win-size) (cdr win-size)) 0.1 500)
   
   (let* ((temp-pos (mapcar #'+ cam-pos cam-ori))
          (temp-mat (mapcar (lambda (x) (* cam-dist x)) (append temp-pos cam-ori cam-up))))
@@ -277,7 +277,7 @@
                                       (max 0.1 
                                            (+ dist-origin
                                               (/ (- y (cdr click-pos))
-                                                 (* 0.125 (cdr win-middle))))))))
+                                                 (* 0.03125 (cdr win-middle))))))))
   (set-project)
   (glut:post-redisplay))
 

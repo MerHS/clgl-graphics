@@ -1,4 +1,4 @@
-DATA?=data.txt
+DATA?=res/data.txt
 
 all: compile obj run
 
