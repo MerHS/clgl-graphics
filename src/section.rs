@@ -35,7 +35,7 @@ impl Spline{
         match &*(s.to_ascii_uppercase()) {
             "BSPLINE" => Spline::Bspline,
             "CATMULL_ROM" | "CATMULL" => Spline::Catmull,
-            "NATNURAL" => Spline::Natural,
+            "NATURAL" => Spline::Natural,
             t @ _ => { println!("there is no spline type {} / default type: BSPLINE",t);
                         Spline::Bspline},
         }

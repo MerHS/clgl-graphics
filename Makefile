@@ -1,15 +1,15 @@
 DATA?=res/data.txt
 
-all: compile obj run
+all: run
+
+run: obj
+	sbcl --load main.lisp
+
+obj: compile
+	./spline_maker $(DATA)
 
 compile:
 	cargo build; cp target/debug/spline_maker .
-
-obj:
-	./spline_maker $(DATA)
-
-run:
-	sbcl --load main.lisp
 
 chess:
 	sbcl --load chess.lisp
